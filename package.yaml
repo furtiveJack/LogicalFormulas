@@ -1,10 +1,10 @@
 name:                LogicalFormulas
 version:             0.1.0.0
-github:              "githubuser/LogicalFormulas"
+github:              "furtiveJack/LogicalFormulas"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+author:              "ttraina - rmarszal"
+maintainer:          "ttraina@etud.u-pem.fr"
+copyright:           "2020 ttraina - rmarszal"
 
 extra-source-files:
 - README.md
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/LogicalFormulas#readme>
+description:         Please see the README on GitHub at <https://github.com/furtiveJack/LogicalFormulas#readme>
 
 dependencies:
 - base >= 4.7 && < 5
