@@ -4,7 +4,8 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3c5a02892cd75c944fb17101486f4cfb23f6614a3db2d1fb0dd1ef99bd48193e
+
+-- hash: a72e5257dfffbea35e9b137fd0c2166925eb2d57d8b5232efda8974fe371e958
 
 name:           LogicalFormulas
 version:        0.1.0.0
@@ -32,6 +33,7 @@ library
       Data.Logic.Var
       Data.Logic.Var.Some
   other-modules:
+      Data.Logic.Fml.Combinator
       Lib
       Paths_LogicalFormulas
   hs-source-dirs:
