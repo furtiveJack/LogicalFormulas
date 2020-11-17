@@ -1,6 +1,6 @@
 module Data.Logic.Fml (
 --  -- * Type
---  Fml (..)
+  Fml (..)
 --
 --  -- * Querying
 --, depth
