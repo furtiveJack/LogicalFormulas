@@ -26,7 +26,9 @@ library:
   source-dirs: src
   exposed-modules :
     - Data.Logic.Fml
+    - Data.Logic.Fml.Some
     - Data.Logic.Var
+    - Data.Logic.Var.Some
 
 executables:
   LogicalFormulas-exe:
