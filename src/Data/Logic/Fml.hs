@@ -3,8 +3,8 @@ module Data.Logic.Fml (
   Fml (..)
 --
 --  -- * Querying
---, depth
---, vars
+, depth
+, vars
 --
 --  -- * Formatting
 , prettyFormat
@@ -54,13 +54,37 @@ prettyFormat (Final v)   = show v
 
 -- |’vars’ @p@ returns all variables that occur in formula @p@. Duplicate
 -- occurrences are removes.
---vars :: (Eq a) => Fml a -> [Var.Var a]
+vars :: (Eq a) => Fml a -> [Var.Var a]
+vars a = L.nub (varsTmp a)
+
+varsTmp :: (Eq a) => Fml a -> [Var.Var a]
+varsTmp (And p q) = (vars p) ++ (vars q)
+varsTmp (NAnd p q) = (vars p) ++ (vars q)
+varsTmp (Or p q) = (vars p) ++ (vars q)
+varsTmp (NOr p q) = (vars p) ++ (vars q)
+varsTmp (XOr p q) = (vars p) ++ (vars q)
+varsTmp (XNOr p q) = (vars p) ++ (vars q)
+varsTmp (Imply p q) = (vars p) ++ (vars q)
+varsTmp (Equiv p q) = (vars p) ++ (vars q)
+varsTmp (Not p) = vars p
+varsTmp (Final v) = [v]
 
 -- |’depth’ @p@ return the depth of fomula @p@.
---depth :: (Num b, Ord b) => Fml a -> b
+depth :: (Num b, Ord b) => Fml a -> b
+depth (And p q) = 1 + max (depth p) (depth q)
+depth (NAnd p q) = 1 + max (depth p) (depth q)
+depth (Or p q) = 1 + max (depth p) (depth q)
+depth (NOr p q) = 1 + max (depth p) (depth q)
+depth (XOr p q) = 1 + max (depth p) (depth q)
+depth (XNOr p q) = 1 + max (depth p) (depth q)
+depth (Imply p q) = 1 + max (depth p) (depth q)
+depth (Equiv p q) = 1 + max (depth p) (depth q)
+depth (Not p) = 1 + depth p
+depth (Final v) = 0
 
 -- |’toNNF’ @f@ converts the formula @f@ to NNF.
---toNNF :: Fml a -> Fml a
+toNNF :: Fml a -> Fml a
+
 
 -- |’toCNF’ @f@ converts the formula @f@ to CNF.
 --toCNF :: Fml a -> Fml a
