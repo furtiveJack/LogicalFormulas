@@ -10,7 +10,7 @@ module Data.Logic.Fml (
 , prettyFormat
 --
 --  -- * Transforming
---, toNNF
+, toNNF
 --, toCNF
 --, toCCNF
 --, toDNF
@@ -82,9 +82,18 @@ depth (Equiv p q) = 1 + max (depth p) (depth q)
 depth (Not p) = 1 + depth p
 depth (Final v) = 0
 
+-- THERE ARE PROBLEMS BRO
 -- |’toNNF’ @f@ converts the formula @f@ to NNF.
 toNNF :: Fml a -> Fml a
-
+toNNF (Final a) = Final a
+toNNF (Not (Not a)) = toNNF a
+toNNF (And p q) = And (toNNF p) (toNNF q)
+toNNF (Or p q) = Or (toNNF p) (toNNF q)
+toNNF (NAnd p q) = Or (toNNF (Not p)) (toNNF (Not q))
+toNNF (NOr p q) = And (toNNF $ Not p) (toNNF $ Not q)
+toNNF (XOr p q) = And (Or (toNNF p) (toNNF q)) (toNNF $ Not (And (toNNF p) (toNNF q)))
+toNNF (XNOr p q) = Not (toNNF (XOr p q))
+toNNF (Not p) = Not $ toNNF p
 
 -- |’toCNF’ @f@ converts the formula @f@ to CNF.
 --toCNF :: Fml a -> Fml a

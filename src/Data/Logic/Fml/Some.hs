@@ -5,7 +5,9 @@ module Data.Logic.Fml.Some (
   fml1,
   fml2,
   fml3,
-  fml4
+  fml4,
+  fml5,
+  fml6
 ) where
 
 import qualified Data.Logic.Fml as Fml
@@ -25,3 +27,7 @@ fml2 = Fml.And vx vy
 fml3 = Fml.Or vy (Fml.Not vz)
 
 fml4 = Fml.Equiv (Fml.And vx vy) (Fml.Or vy (Fml.Not vz))
+
+fml5 = Fml.XOr vx vy
+
+fml6 = Fml.XNOr vx vy
