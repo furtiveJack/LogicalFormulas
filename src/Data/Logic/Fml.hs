@@ -7,7 +7,7 @@ module Data.Logic.Fml (
 --, vars
 --
 --  -- * Formatting
---, prettyFormat
+, prettyFormat
 --
 --  -- * Transforming
 --, toNNF

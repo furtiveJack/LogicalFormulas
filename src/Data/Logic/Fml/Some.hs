@@ -1,23 +1,27 @@
 module Data.Logic.Fml.Some (
+  vx,
+  vy,
+  vz,
   fml1,
   fml2,
   fml3,
---  fml4,
---  fml5,
---  fml6,
---  fml7,
---  fml8,
---  fml9,
---  fml10,
---  fml11
+  fml4
 ) where
 
 import qualified Data.Logic.Fml as Fml
 import qualified Data.Logic.Var as Var
 
 
-fml1 = Fml.Final (Var.mk "a")
+vx = Fml.Final (Var.mk "x")
 
-fml2 = Fml.Final (Var.mk "1")
+vy = Fml.Final (Var.mk "y")
 
-fml3 = Fml.And fml1 fml2
+vz = Fml.Final (Var.mk "z")
+
+fml1 = Fml.Not vx
+
+fml2 = Fml.And vx vy
+
+fml3 = Fml.Or vy (Fml.Not vz)
+
+fml4 = Fml.Equiv (Fml.And vx vy) (Fml.Or vy (Fml.Not vz))
