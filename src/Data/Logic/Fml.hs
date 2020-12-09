@@ -89,14 +89,22 @@ toNNF (Final a) = Final a
 toNNF (Not (Not a)) = toNNF a
 toNNF (And p q) = And (toNNF p) (toNNF q)
 toNNF (Or p q) = Or (toNNF p) (toNNF q)
-toNNF (NAnd p q) = Or (toNNF (Not p)) (toNNF (Not q))
-toNNF (NOr p q) = And (toNNF $ Not p) (toNNF $ Not q)
-toNNF (XOr p q) = And (Or (toNNF p) (toNNF q)) (toNNF $ Not (And (toNNF p) (toNNF q)))
-toNNF (XNOr p q) = Not (toNNF (XOr p q))
-toNNF (Not p) = Not $ toNNF p
+toNNF (NAnd p q) = Or (Not (toNNF p)) (Not (toNNF q))
+toNNF (NOr p q) = And (Not (toNNF p)) (Not (toNNF q))
+toNNF (XOr p q) = And (Or (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
+toNNF (XNOr p q) = Or (And (toNNF p) (toNNF q)) (And (Not (toNNF p)) (Not (toNNF q)))
+toNNF (Imply p q) = Or (toNNF q) (Not (toNNF p))
+toNNF (Equiv p q) = And (toNNF (Imply (toNNF p) (toNNF q))) (toNNF (Imply (toNNF q) (toNNF p)))
+toNNF (Not p) = Not (toNNF p)
 
 -- |’toCNF’ @f@ converts the formula @f@ to CNF.
---toCNF :: Fml a -> Fml a
+toCNF :: Fml a -> Fml a
+toCNF (Final a) = Final a
+toCNF (Not (Not a)) = ttoCNF a
+toCNF (And p q) = And (toCNF p) (toCNF q)
+toCNF (Or p q) = Or (toCNF p) (toCNF q)
+where p = toNNF p ...
+
 
 -- |’toDNF’ @f@ converts the formula @f@ to DNF.
 --toDNF :: Fml a -> Fml a
