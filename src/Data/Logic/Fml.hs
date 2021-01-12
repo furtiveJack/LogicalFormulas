@@ -11,7 +11,7 @@ module Data.Logic.Fml (
 --
 --  -- * Transforming
 , toNNF
---, toCNF
+, toCNF
 --, toCCNF
 --, toDNF
 --, toUniversalNAnd
@@ -88,10 +88,13 @@ toNNF :: Fml a -> Fml a
 toNNF (Final a) = Final a
 toNNF (Not (Not a)) = toNNF a
 toNNF (And p q) = And (toNNF p) (toNNF q)
-toNNF (Or p q) = Or (toNNF p) (toNNF q)
+toNNF (Not (And p q)) = toNNF (NAnd p q)
 toNNF (NAnd p q) = Or (Not (toNNF p)) (Not (toNNF q))
+toNNF (Or p q) = Or (toNNF p) (toNNF q)
+toNNF (Not (Or p q)) = toNNF (NOr p q)
 toNNF (NOr p q) = And (Not (toNNF p)) (Not (toNNF q))
 toNNF (XOr p q) = And (Or (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
+toNNF (Not (XOr p q)) = toNNF (XNOr p q)
 toNNF (XNOr p q) = Or (And (toNNF p) (toNNF q)) (And (Not (toNNF p)) (Not (toNNF q)))
 toNNF (Imply p q) = Or (toNNF q) (Not (toNNF p))
 toNNF (Equiv p q) = And (toNNF (Imply (toNNF p) (toNNF q))) (toNNF (Imply (toNNF q) (toNNF p)))
@@ -99,12 +102,18 @@ toNNF (Not p) = Not (toNNF p)
 
 -- |’toCNF’ @f@ converts the formula @f@ to CNF.
 toCNF :: Fml a -> Fml a
-toCNF (Final a) = Final a
-toCNF (Not (Not a)) = ttoCNF a
-toCNF (And p q) = And (toCNF p) (toCNF q)
-toCNF (Or p q) = Or (toCNF p) (toCNF q)
-where p = toNNF p ...
+toCNF = toCNF' . toNNF
+  where
+    toCNF' :: Fml a -> Fml a
+    toCNF' (Final a) = Final a
+    toCNF' (And p q) = And (toCNF' p) (toCNF' q)
+    toCNF' (Or p q) = (toCNF' p) `distribution` (toCNF' q)
+    toCNF' (Not p) = Not p
 
+    distribution :: Fml a -> Fml a -> Fml a
+    distribution (And p q) r = And (p `distribution` r) (q `distribution` r)
+    distribution p (And q r) = And (p `distribution` q) (p `distribution` r)
+    distribution p q = Or p q
 
 -- |’toDNF’ @f@ converts the formula @f@ to DNF.
 --toDNF :: Fml a -> Fml a
