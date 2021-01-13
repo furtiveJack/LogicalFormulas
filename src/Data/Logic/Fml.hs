@@ -12,7 +12,7 @@ module Data.Logic.Fml (
 --  -- * Transforming
 , toNNF
 , toCNF
---, toCCNF
+, toCCNF
 , toDNF
 , toUniversalNAnd
 , toUniversalNOr
@@ -20,7 +20,7 @@ module Data.Logic.Fml (
 --  -- * Testing
 , isNNF
 , isCNF
---, isCCNF
+, isCCNF
 , isDNF
 , isUniversalNAnd
 , isUniversalNOr
@@ -72,7 +72,7 @@ varsTmp (Equiv p q) = (vars p) ++ (vars q)
 varsTmp (Not p) = vars p
 varsTmp (Final v) = [v]
 
--- |’depth’ @p@ return the depth of fomula @p@.
+-- |’depth’ @p@ return the depth of formula @p@.
 depth :: (Num b, Ord b) => Fml a -> b
 depth (And p q) = 1 + max (depth p) (depth q)
 depth (NAnd p q) = 1 + max (depth p) (depth q)
@@ -92,7 +92,7 @@ toNNF (Final a) = Final a
 toNNF (Not (Not a)) = toNNF a
 toNNF (And p q) = And (toNNF p) (toNNF q)
 toNNF (Not (And p q)) = toNNF (NAnd p q)
-toNNF (NAnd p q) = Or (Not (toNNF p)) (Not (toNNF q))
+toNNF (NAnd p q) = toNNF (Or (Not (toNNF p)) (Not (toNNF q)))
 toNNF (Or p q) = Or (toNNF p) (toNNF q)
 toNNF (Not (Or p q)) = toNNF (NOr p q)
 toNNF (NOr p q) = And (Not (toNNF p)) (Not (toNNF q))
@@ -194,8 +194,28 @@ isUniversalNOr (NOr p q) = (isUniversalNOr p) && (isUniversalNOr q)
 isUniversalNOr _ = False
 
 -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
---toCCNF :: Fml a -> Fml a
+toCCNF :: Fml a -> Fml a
+toCCNF = toCCNF' . toCNF
+  where
+    toCCNF' :: Fml a -> Fml a
+    toCCNF' (Final a) = Final a
+    toCCNF' (And (Final p) q) = (And (Final p) q)
+    toCCNF' (And (And p q) r) = toCCNF' (And p (And (toCCNF' q) (toCCNF' r)))
+    toCCNF' (And (Or p q) r) = (And (Or (toCCNF' p) (toCCNF' q)) (toCCNF' r))
+    toCCNF' (Or p q) = (Or (toCCNF' p) (toCCNF' q))
+    toCCNF' (Not (Final p)) = Not (Final p)
+    toCCNF' (Not p) = Not p
 
 -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
---isCCNF :: Fml a -> Bool
+isCCNF :: Fml a -> Bool
+isCCNF p = (isCNF p) && (isCCNF' p)
+  where
+    isCCNF' :: Fml a -> Bool
+    isCCNF' (And q r) = (isClause q) && (isCCNF r)
+    isCCNF' p = (isClause p) || (isCCNF p)
 
+    isClause :: Fml a -> Bool
+    isClause (Final a) = True
+    isClause (And (Final p) q) = True
+    isClause (Or p q) = True
+    isClause _ = False
