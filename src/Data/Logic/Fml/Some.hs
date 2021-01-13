@@ -15,7 +15,10 @@ module Data.Logic.Fml.Some (
   fml7,
   fml8,
   fml9,
-  fml10
+  fml10,
+  fml11,
+  fml12,
+  fml13
 ) where
 
 import qualified Data.Logic.Fml as Fml
@@ -55,3 +58,9 @@ fml8 = Fml.NAnd a b
 fml9 = Fml.NAnd (Fml.NAnd a b) c
 
 fml10 = Fml.NAnd (Fml.And a b) c
+
+fml11 = Fml.And (Fml.And (Fml.Or (Fml.And (Fml.And a vz) vx) vy) b) (Fml.And c d)
+
+fml12 = Fml.And a (Fml.And b (Fml.And c d))
+
+fml13 = Fml.And (Fml.And (Fml.Or a b) (Fml.Or (Fml.Not b) c)) (Fml.Or (Fml.Or a b) (Fml.Not c))
