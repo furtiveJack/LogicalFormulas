@@ -32,8 +32,8 @@ library
       Data.Logic.Fml.Some
       Data.Logic.Var
       Data.Logic.Var.Some
-  other-modules:
       Data.Logic.Fml.Combinator
+  other-modules:
       Lib
       Paths_LogicalFormulas
   hs-source-dirs:

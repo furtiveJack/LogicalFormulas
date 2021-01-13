@@ -194,7 +194,7 @@ isUniversalNOr (NOr p q) = (isUniversalNOr p) && (isUniversalNOr q)
 isUniversalNOr _ = False
 
 -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
-toCCNF :: Fml a -> Fml a
+--toCCNF :: Fml a -> Fml a
 
 -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
 --isCCNF :: Fml a -> Bool
