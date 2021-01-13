@@ -13,14 +13,17 @@ module Data.Logic.Fml (
 , toNNF
 , toCNF
 --, toCCNF
---, toDNF
---, toUniversalNAnd
+, toDNF
+, toUniversalNAnd
+, toUniversalNOr
 --
 --  -- * Testing
---, isNNF
---, isCNF
+, isNNF
+, isCNF
 --, isCCNF
---, isDNF
+, isDNF
+, isUniversalNAnd
+, isUniversalNOr
 ) where
 
 import qualified Data.Foldable  as F
@@ -116,35 +119,82 @@ toCNF = toCNF' . toNNF
     distribution p q = Or p q
 
 -- |’toDNF’ @f@ converts the formula @f@ to DNF.
---toDNF :: Fml a -> Fml a
+toDNF :: Fml a -> Fml a
+toDNF = toDNF' . toNNF
+  where
+    toDNF' :: Fml a -> Fml a
+    toDNF' (Final a) = Final a
+    toDNF' (And p q) = (toDNF' p) `distribution` (toDNF' q)
+    toDNF' (Or p q) = Or (toDNF' p) (toDNF' q)
+    toDNF' (Not p) = Not p
+
+    distribution :: Fml a -> Fml a -> Fml a
+    distribution (Or p q) r = Or (p `distribution` r) (q `distribution` r)
+    distribution p (Or q r) = Or (p `distribution` q) (p `distribution` r)
+    distribution p q = And p q
 
 -- |’isNNF’ @f@ returns true iff formula @f@ is NNF.
---isNNF :: Fml a -> Fml a
+isNNF :: Fml a -> Bool
+isNNF (Final a) = True
+isNNF (Not (Final a)) = True
+isNNF (And p q) = (isNNF p) && (isNNF q)
+isNNF (Or p q) = (isNNF p) && (isNNF q)
+isNNF _ = False
 
 -- |’isCNF’ @f@ returns true iff formula @f@ is CNF.
---isCNF :: Fml a -> Fml a
+isCNF :: Fml a -> Bool
+isCNF (Or p (And q r)) = False
+isCNF (Or (And p q) r) = False
+isCNF (And p q) = (isCNF p) && (isCNF q)
+isCNF (Or p q) = (isCNF p) && (isCNF q)
+isCNF a = isNNF a
 
 -- |’isDNF’ @f@ returns true iff formula @f@ is DNF.
---isDNF :: Fml a -> Fml a
+isDNF :: Fml a -> Bool
+isDNF (And p (Or q r)) = False
+isDNF (And (Or p q) r) = False
+isDNF (Or p q) = (isDNF p) && (isDNF q)
+isDNF (And p q) = (isDNF p) && (isDNF q)
+isDNF a = isNNF a
 
 -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
 -- to formula @p@.
---toUniversalNAnd :: Fml a -> Fml a
+toUniversalNAnd :: Fml a -> Fml a
+toUniversalNAnd = toUniversalNAnd' . toNNF
+  where
+    toUniversalNAnd' :: Fml a -> Fml a
+    toUniversalNAnd' (Final a) = Final a
+    toUniversalNAnd' (Not p) = NAnd (toUniversalNAnd' p) (toUniversalNAnd' p)
+    toUniversalNAnd' (Or p q) = NAnd (NAnd (toUniversalNAnd' p) (toUniversalNAnd' p)) (NAnd (toUniversalNAnd' q) (toUniversalNAnd' q))
+    toUniversalNAnd' (And p q) = NAnd (NAnd (toUniversalNAnd' p) (toUniversalNAnd' q)) (NAnd (toUniversalNAnd' p) (toUniversalNAnd' q))
 
 -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
 -- to formula @p@.
---toUniversalNOr :: Fml a -> Fml a
+toUniversalNOr :: Fml a -> Fml a
+toUniversalNOr = toUniversalNOr' . toNNF
+  where
+    toUniversalNOr' :: Fml a -> Fml a
+    toUniversalNOr' (Final a) = Final a
+    toUniversalNOr' (Not p) = NOr (toUniversalNOr' p) (toUniversalNOr' p)
+    toUniversalNOr' (Or p q) = NOr (NOr (toUniversalNOr' p) (toUniversalNOr' q)) (NOr (toUniversalNOr' p) (toUniversalNOr' q))
+    toUniversalNOr' (And p q) = NOr (NOr (toUniversalNOr' p) (toUniversalNOr' p)) (NOr (toUniversalNOr' q) (toUniversalNOr' q))
 
 -- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
 -- and variables.
---isUniversalNAnd :: Fml a -> Bool
+isUniversalNAnd :: Fml a -> Bool
+isUniversalNAnd (Final a) = True
+isUniversalNAnd (NAnd p q) = (isUniversalNAnd p) && (isUniversalNAnd q)
+isUniversalNAnd _ = False
 
 -- |’isUniversalNOr’ @p@ returns true iff formula @p@ uses only NOR
 -- and variables.
---isUniversalNOr :: Fml a -> Bool
+isUniversalNOr :: Fml a -> Bool
+isUniversalNOr (Final a) = True
+isUniversalNOr (NOr p q) = (isUniversalNOr p) && (isUniversalNOr q)
+isUniversalNOr _ = False
 
 -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
---toCCNF :: Fml a -> Fml a
+toCCNF :: Fml a -> Fml a
 
 -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
 --isCCNF :: Fml a -> Bool
