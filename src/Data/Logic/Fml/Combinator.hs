@@ -7,12 +7,14 @@ module Data.Logic.Fml.Combinator (
 , allOf
 , noneOf
 , atLeast
---, atLeastOne
---, atMost
+, atLeastOne
+, atMost
 --, atMostOne
 --, exactly
 --, exactlyOne
 ) where
+
+import Data.List (subsequences)
 
 import qualified Data.Logic.Fml      as Fml
 import qualified Data.Logic.Var      as Var
@@ -72,19 +74,66 @@ noneOf a = multAnd (noneOf' a)
 -- empty list or @k@ is non-positive or @k@ is larger than the number of
 -- variables in @vs@.
 atLeast :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
-atLeast ([], k) = Nothing
-atLeast (all@(x:xs), k) = if (k <= 0 || k > (length all)) then Nothing else Just (Fml.Final x)
+atLeast [] k = Nothing
+atLeast xs k
+  | k <= 0 = Nothing
+  | k > (length xs) = Nothing
+  | otherwise = Just (combinaisons xs k)
+    where
+      combinaisons :: [Var.Var a] -> Int -> Fml.Fml a
+      combinaisons liste k = applyOr (applyAnd (getKCombi liste k))
+
+      getKCombi :: [Var.Var a] -> Int -> [[Var.Var a]]
+      getKCombi liste k = filter (\variables -> (length variables) == k) (subsequences liste)
+
+      applyAnd :: [[Var.Var a]] -> [Fml.Fml a]
+      applyAnd liste = map (\pListe -> fromJust (multAnd (varLstToFmlLst pListe))) liste
+
+      applyOr :: [Fml.Fml a] -> Fml.Fml a
+      applyOr liste = fromJust (multOr liste)
+
+      varLstToFmlLst :: [Var.Var a] -> [Fml.Fml a]
+      varLstToFmlLst (liste) = map (\var -> Fml.Final var) liste
+
+      fromJust :: Maybe a -> a
+      fromJust (Just a) = a
+      fromJust Nothing = error "Oops, you goofed up, fool."
 
 -- |’atLeastOne’ @vs@ returns a formula that is satisfiable iff at least one
 -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
 -- empty list.
---atLeastOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+atLeastOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+atLeastOne lst = atLeast lst 1
 
 -- |’atMost’ @vs@ @k@ returns a formula that is satisfiable iff at most @k@
 -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
 -- empty list or @k@ is non-positive or @k@ is larger than the number of
 -- variables in @vs@.
 --atMost :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+--atMost [] k = Nothing
+--atMost xs k
+--  | k <= 0 = Nothing
+--  | k > (length xs) = Nothing
+--  | otherwise = Just (combinaisons xs k)
+--    where
+--      combinaisons :: [Var.Var a] -> Int -> Fml.Fml a
+--      combinaisons liste k = applyOr (applyAnd (getKCombi liste k))
+--
+--      getKCombi :: [Var.Var a] -> Int -> [[Var.Var a]]
+--      getKCombi liste k = filter (\variables -> (length variables) == k) (subsequences liste)
+--
+--      applyAnd :: [[Var.Var a]] -> [Fml.Fml a]
+--      applyAnd liste = map (\pListe -> fromJust (multAnd (varLstToFmlLst pListe))) liste
+--
+--      applyOr :: [Fml.Fml a] -> Fml.Fml a
+--      applyOr liste = fromJust (multOr liste)
+--
+--      varLstToFmlLst :: [Var.Var a] -> [Fml.Fml a]
+--      varLstToFmlLst (liste) = map (\var -> Fml.Final var) liste
+--
+--      fromJust :: Maybe a -> a
+--      fromJust (Just a) = a
+--      fromJust Nothing = error "Oops, you goofed up, fool."
 
 -- |’atMostOne’ @vs@ returns a formula that is satisfiable iff at most one
 -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the

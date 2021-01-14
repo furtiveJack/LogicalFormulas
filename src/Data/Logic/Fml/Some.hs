@@ -7,7 +7,6 @@ module Data.Logic.Fml.Some (
   f,
   fml1,
   fml2,
-  fml3,
 ) where
 
 import qualified Data.Logic.Fml as Fml
@@ -25,8 +24,6 @@ e = Fml.Final (Var.mk "e")
 
 f = Fml.Final (Var.mk "f")
 
-fml1 = Fml.And (Fml.And (Fml.Or (Fml.And (Fml.And a vz) vx) vy) b) (Fml.And c d)
+fml1 = Fml.And a (Fml.And b (Fml.And c d))
 
-fml2 = Fml.And a (Fml.And b (Fml.And c d))
-
-fml3 = Fml.And (Fml.And (Fml.Or a b) (Fml.Or (Fml.Not b) c)) (Fml.Or (Fml.Or a b) (Fml.Not c))
+fml2 = Fml.And (Fml.And (Fml.Or a b) (Fml.Or (Fml.Not b) c)) (Fml.Or (Fml.Or a b) (Fml.Not c))
