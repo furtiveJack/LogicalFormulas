@@ -9,7 +9,7 @@ module Data.Logic.Fml.Combinator (
 , atLeast
 , atLeastOne
 , atMost
---, atMostOne
+, atMostOne
 --, exactly
 --, exactlyOne
 ) where
@@ -78,26 +78,7 @@ atLeast [] k = Nothing
 atLeast xs k
   | k <= 0 = Nothing
   | k > (length xs) = Nothing
-  | otherwise = Just (combinaisons xs k)
-    where
-      combinaisons :: [Var.Var a] -> Int -> Fml.Fml a
-      combinaisons liste k = applyOr (applyAnd (getKCombi liste k))
-
-      getKCombi :: [Var.Var a] -> Int -> [[Var.Var a]]
-      getKCombi liste k = filter (\variables -> (length variables) == k) (subsequences liste)
-
-      applyAnd :: [[Var.Var a]] -> [Fml.Fml a]
-      applyAnd liste = map (\pListe -> fromJust (multAnd (varLstToFmlLst pListe))) liste
-
-      applyOr :: [Fml.Fml a] -> Fml.Fml a
-      applyOr liste = fromJust (multOr liste)
-
-      varLstToFmlLst :: [Var.Var a] -> [Fml.Fml a]
-      varLstToFmlLst (liste) = map (\var -> Fml.Final var) liste
-
-      fromJust :: Maybe a -> a
-      fromJust (Just a) = a
-      fromJust Nothing = error "Oops, you goofed up, fool."
+  | otherwise = Just (logicalCombinator (\var -> Fml.Final var) xs k)
 
 -- |’atLeastOne’ @vs@ returns a formula that is satisfiable iff at least one
 -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
@@ -109,36 +90,18 @@ atLeastOne lst = atLeast lst 1
 -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
 -- empty list or @k@ is non-positive or @k@ is larger than the number of
 -- variables in @vs@.
---atMost :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
---atMost [] k = Nothing
---atMost xs k
---  | k <= 0 = Nothing
---  | k > (length xs) = Nothing
---  | otherwise = Just (combinaisons xs k)
---    where
---      combinaisons :: [Var.Var a] -> Int -> Fml.Fml a
---      combinaisons liste k = applyOr (applyAnd (getKCombi liste k))
---
---      getKCombi :: [Var.Var a] -> Int -> [[Var.Var a]]
---      getKCombi liste k = filter (\variables -> (length variables) == k) (subsequences liste)
---
---      applyAnd :: [[Var.Var a]] -> [Fml.Fml a]
---      applyAnd liste = map (\pListe -> fromJust (multAnd (varLstToFmlLst pListe))) liste
---
---      applyOr :: [Fml.Fml a] -> Fml.Fml a
---      applyOr liste = fromJust (multOr liste)
---
---      varLstToFmlLst :: [Var.Var a] -> [Fml.Fml a]
---      varLstToFmlLst (liste) = map (\var -> Fml.Final var) liste
---
---      fromJust :: Maybe a -> a
---      fromJust (Just a) = a
---      fromJust Nothing = error "Oops, you goofed up, fool."
+atMost :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+atMost [] k = Nothing
+atMost xs k
+  | k <= 0 = Nothing
+  | k > (length xs) = Nothing
+  | otherwise = Just (logicalCombinator (\var -> Fml.Not (Fml.Final var)) xs ((length xs) - k))
 
 -- |’atMostOne’ @vs@ returns a formula that is satisfiable iff at most one
 -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
 -- empty list.
---atMostOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+atMostOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+atMostOne lst = atMost lst 1
 
 -- |’exactly’ @vs@ @k@ returns a formula that is satisfiable iff exactly @k@
 -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
@@ -151,3 +114,21 @@ atLeastOne lst = atLeast lst 1
 -- empty list.
 --exactlyOne :: [Var.Var a] -> Maybe (Fml.Fml a)
 
+logicalCombinator :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> Int ->  Fml.Fml a
+logicalCombinator lambda xs k = applyOr (applyAnd lambda (getKCombi xs k))
+  where    
+    getKCombi :: [Var.Var a] -> Int -> [[Var.Var a]]
+    getKCombi liste k = filter (\variables -> (length variables) == k) (subsequences liste)
+    
+    applyAnd :: (Var.Var a -> Fml.Fml a) -> [[Var.Var a]] -> [Fml.Fml a]
+    applyAnd lambda liste = map (\pListe -> fromJust (multAnd (varLstToFmlLst lambda pListe))) liste
+    
+    applyOr :: [Fml.Fml a] -> Fml.Fml a
+    applyOr liste = fromJust (multOr liste)
+    
+    varLstToFmlLst :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> [Fml.Fml a]
+    varLstToFmlLst lambda liste = map (lambda) liste
+    
+    fromJust :: Maybe a -> a
+    fromJust (Just a) = a
+    fromJust Nothing = error "Oops, you goofed up, fool."
