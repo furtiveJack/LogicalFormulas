@@ -1,29 +1,55 @@
 module Data.Logic.Fml.Some (
-  a,
-  b,
-  c,
-  d,
-  e,
-  f,
-  fml1,
-  fml2,
+  v1,
+  v2,
+  v3,
+  v4,
+  v5,
+  v6,
+  allOfFml,
+  noneOfFml,
+  atLeastOneFml,
+  atLeastTwoFml,
+  atMostOneFml,
+  atMostTwoFml,
+  exactlyOneFml,
+  exactlyTwoFml
 ) where
 
 import qualified Data.Logic.Fml as Fml
 import qualified Data.Logic.Var as Var
 
-a = Fml.Final (Var.mk "a")
+v1 = Fml.Final (Var.mk 1)
 
-b = Fml.Final (Var.mk "b")
+v2 = Fml.Final (Var.mk 2)
 
-c = Fml.Final (Var.mk "c")
+v3 = Fml.Final (Var.mk 3)
 
-d = Fml.Final (Var.mk "d")
+v4 = Fml.Final (Var.mk 4)
 
-e = Fml.Final (Var.mk "e")
+v5 = Fml.Final (Var.mk 5)
 
-f = Fml.Final (Var.mk "f")
+v6 = Fml.Final (Var.mk 6)
 
-fml1 = Fml.And a (Fml.And b (Fml.And c d))
+allOfFml = Fml.And v1 (Fml.And v2 (Fml.And v3 v4))
 
-fml2 = Fml.And (Fml.And (Fml.Or a b) (Fml.Or (Fml.Not b) c)) (Fml.Or (Fml.Or a b) (Fml.Not c))
+noneOfFml = Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.And (Fml.Not v3) (Fml.Not v4)))
+
+atLeastOneFml = Fml.Or v1 (Fml.Or v2 (Fml.Or v3 v4))
+
+atLeastTwoFml = Fml.Or (Fml.And v1 v2) (Fml.Or (Fml.And v1 v3) (Fml.Or (Fml.And v1 v4) (Fml.Or (Fml.And v2 v3) (Fml.Or (Fml.And v2 v4) (Fml.And v3 v4)))))
+
+atMostOneFml = Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.Not v3)))
+                      (Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.Not v4)))
+                              (Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v3) (Fml.Not v4)))
+                                      (Fml.And (Fml.Not v2) (Fml.And (Fml.Not v3) (Fml.Not v4)))))
+
+atMostTwoFml = Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v2))
+                      (Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v3))
+                              (Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v4))
+                                      (Fml.Or (Fml.And (Fml.Not v2) (Fml.Not v3))
+                                              (Fml.Or (Fml.And (Fml.Not v2) (Fml.Not v4))
+                                                      (Fml.And (Fml.Not v3) (Fml.Not v4))))))
+
+exactlyOneFml = Fml.And atLeastOneFml atMostOneFml
+
+exactlyTwoFml = Fml.And atLeastTwoFml atMostTwoFml
