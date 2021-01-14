@@ -10,8 +10,8 @@ module Data.Logic.Fml.Combinator (
 , atLeastOne
 , atMost
 , atMostOne
---, exactly
---, exactlyOne
+, exactly
+, exactlyOne
 ) where
 
 import Data.List (subsequences)
@@ -120,21 +120,24 @@ exactly xs k
 exactlyOne :: [Var.Var a] -> Maybe (Fml.Fml a)
 exactlyOne lst = exactly lst 1
 
+-- |`logicalCombinator` @lambda@ @xs@ @k@ returns a formula that is satisfiable if (depending on the lambda)
+-- at most / at least @k@ variables in @vs@ are true. Parameters verifications must be done by the caller.
 logicalCombinator :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> Int ->  Fml.Fml a
 logicalCombinator lambda xs k = applyOr (applyAnd lambda (getKCombi xs k))
-  where    
+  where
     getKCombi :: [Var.Var a] -> Int -> [[Var.Var a]]
     getKCombi liste k = filter (\variables -> (length variables) == k) (subsequences liste)
-    
+
     applyAnd :: (Var.Var a -> Fml.Fml a) -> [[Var.Var a]] -> [Fml.Fml a]
     applyAnd lambda liste = map (\pListe -> fromJust (multAnd (varLstToFmlLst lambda pListe))) liste
-    
+
     applyOr :: [Fml.Fml a] -> Fml.Fml a
     applyOr liste = fromJust (multOr liste)
-    
+
     varLstToFmlLst :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> [Fml.Fml a]
     varLstToFmlLst lambda liste = map (lambda) liste
 
+-- |`fromJust` @a@ retrieves the value of @a@ if it is a @Just@, raises an error if it is a @Nothing@.
 fromJust :: Maybe a -> a
 fromJust (Just a) = a
 fromJust Nothing = error "Oops, you goofed up, fool."
