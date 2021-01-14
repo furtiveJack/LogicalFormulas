@@ -76,8 +76,7 @@ noneOf a = multAnd (noneOf' a)
 atLeast :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
 atLeast [] k = Nothing
 atLeast xs k
-  | k <= 0 = Nothing
-  | k > (length xs) = Nothing
+  | k <= 0 || k > (length xs) = Nothing
   | otherwise = Just (logicalCombinator (\var -> Fml.Final var) xs k)
 
 -- |’atLeastOne’ @vs@ returns a formula that is satisfiable iff at least one
@@ -93,8 +92,7 @@ atLeastOne lst = atLeast lst 1
 atMost :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
 atMost [] k = Nothing
 atMost xs k
-  | k <= 0 = Nothing
-  | k > (length xs) = Nothing
+  | k <= 0 || k > (length xs) = Nothing
   | otherwise = Just (logicalCombinator (\var -> Fml.Not (Fml.Final var)) xs ((length xs) - k))
 
 -- |’atMostOne’ @vs@ returns a formula that is satisfiable iff at most one
@@ -110,8 +108,7 @@ atMostOne lst = atMost lst 1
 exactly :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
 exactly [] k = Nothing
 exactly xs k
-  | k <= 0 = Nothing
-  | k > (length xs) = Nothing
+  | k <= 0 || k > (length xs) = Nothing
   | otherwise = Just (Fml.And (fromJust (atLeast xs k)) (fromJust (atMost xs ((length xs) - k))))
 
 -- |’exactlyOne’ @vs@ returns a formula that is satisfiable iff exactly one
@@ -126,18 +123,18 @@ logicalCombinator :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> Int ->  Fml.Fml 
 logicalCombinator lambda xs k = applyOr (applyAnd lambda (getKCombi xs k))
   where
     getKCombi :: [Var.Var a] -> Int -> [[Var.Var a]]
-    getKCombi liste k = filter (\variables -> (length variables) == k) (subsequences liste)
+    getKCombi lst k = filter (\variables -> (length variables) == k) (subsequences lst)
 
     applyAnd :: (Var.Var a -> Fml.Fml a) -> [[Var.Var a]] -> [Fml.Fml a]
-    applyAnd lambda liste = map (\pListe -> fromJust (multAnd (varLstToFmlLst lambda pListe))) liste
+    applyAnd lambda lst = map (\pList -> fromJust (multAnd (varLstToFmlLst lambda pList))) lst
 
     applyOr :: [Fml.Fml a] -> Fml.Fml a
-    applyOr liste = fromJust (multOr liste)
+    applyOr lst = fromJust (multOr lst)
 
     varLstToFmlLst :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> [Fml.Fml a]
-    varLstToFmlLst lambda liste = map (lambda) liste
+    varLstToFmlLst lambda lst = map (lambda) lst
 
 -- |`fromJust` @a@ retrieves the value of @a@ if it is a @Just@, raises an error if it is a @Nothing@.
 fromJust :: Maybe a -> a
 fromJust (Just a) = a
-fromJust Nothing = error "Oops, you goofed up, fool."
+fromJust Nothing = error "Nothing to get from this Maybe"
