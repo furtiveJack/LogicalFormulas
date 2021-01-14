@@ -107,12 +107,18 @@ atMostOne lst = atMost lst 1
 -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
 -- empty list or @k@ is non-positive or @k@ is larger than the number of
 -- variables in @vs@.
---exactly :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+exactly :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+exactly [] k = Nothing
+exactly xs k
+  | k <= 0 = Nothing
+  | k > (length xs) = Nothing
+  | otherwise = Just (Fml.And (fromJust (atLeast xs k)) (fromJust (atMost xs ((length xs) - k))))
 
 -- |’exactlyOne’ @vs@ returns a formula that is satisfiable iff exactly one
 -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
 -- empty list.
---exactlyOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+exactlyOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+exactlyOne lst = exactly lst 1
 
 logicalCombinator :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> Int ->  Fml.Fml a
 logicalCombinator lambda xs k = applyOr (applyAnd lambda (getKCombi xs k))
@@ -128,7 +134,7 @@ logicalCombinator lambda xs k = applyOr (applyAnd lambda (getKCombi xs k))
     
     varLstToFmlLst :: (Var.Var a -> Fml.Fml a) -> [Var.Var a] -> [Fml.Fml a]
     varLstToFmlLst lambda liste = map (lambda) liste
-    
-    fromJust :: Maybe a -> a
-    fromJust (Just a) = a
-    fromJust Nothing = error "Oops, you goofed up, fool."
+
+fromJust :: Maybe a -> a
+fromJust (Just a) = a
+fromJust Nothing = error "Oops, you goofed up, fool."
