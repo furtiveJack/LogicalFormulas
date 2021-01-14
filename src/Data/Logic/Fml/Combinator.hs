@@ -109,7 +109,7 @@ exactly :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
 exactly [] k = Nothing
 exactly xs k
   | k <= 0 || k > (length xs) = Nothing
-  | otherwise = Just (Fml.And (fromJust (atLeast xs k)) (fromJust (atMost xs ((length xs) - k))))
+  | otherwise = Just (Fml.And (fromJust (atLeast xs k)) (fromJust (atMost xs k)))
 
 -- |’exactlyOne’ @vs@ returns a formula that is satisfiable iff exactly one
 -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the

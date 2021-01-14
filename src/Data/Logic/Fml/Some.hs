@@ -36,7 +36,7 @@ noneOfFml = Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.And (Fml.Not v3) (Fm
 
 atLeastOneFml = Fml.Or v1 (Fml.Or v2 (Fml.Or v3 v4))
 
-atLeastTwoFml = Fml.Or (Fml.And v1 v2) (Fml.Or (Fml.And v1 v3) (Fml.Or (Fml.And v1 v4) (Fml.Or (Fml.And v2 v3) (Fml.Or (Fml.And v2 v4) (Fml.And v3 v4)))))
+atLeastTwoFml = Fml.Or (Fml.And v1 v2) (Fml.Or (Fml.And v1 v3) (Fml.Or (Fml.And v2 v3) (Fml.Or (Fml.And v1 v4) (Fml.Or (Fml.And v2 v4) (Fml.And v3 v4)))))
 
 atMostOneFml = Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.Not v3)))
                       (Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.Not v4)))
@@ -45,8 +45,8 @@ atMostOneFml = Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.Not v3)))
 
 atMostTwoFml = Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v2))
                       (Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v3))
-                              (Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v4))
-                                      (Fml.Or (Fml.And (Fml.Not v2) (Fml.Not v3))
+                              (Fml.Or (Fml.And (Fml.Not v2) (Fml.Not v3))
+                                      (Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v4))
                                               (Fml.Or (Fml.And (Fml.Not v2) (Fml.Not v4))
                                                       (Fml.And (Fml.Not v3) (Fml.Not v4))))))
 
