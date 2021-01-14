@@ -1,35 +1,17 @@
 module Data.Logic.Fml.Some (
-  vx,
-  vy,
-  vz,
   a,
   b,
   c,
   d,
+  e,
+  f,
   fml1,
   fml2,
   fml3,
-  fml4,
-  fml5,
-  fml6,
-  fml7,
-  fml8,
-  fml9,
-  fml10,
-  fml11,
-  fml12,
-  fml13
 ) where
 
 import qualified Data.Logic.Fml as Fml
 import qualified Data.Logic.Var as Var
-
-
-vx = Fml.Final (Var.mk "x")
-
-vy = Fml.Final (Var.mk "y")
-
-vz = Fml.Final (Var.mk "z")
 
 a = Fml.Final (Var.mk "a")
 
@@ -39,28 +21,12 @@ c = Fml.Final (Var.mk "c")
 
 d = Fml.Final (Var.mk "d")
 
-fml1 = Fml.Not vx
+e = Fml.Final (Var.mk "e")
 
-fml2 = Fml.And vx vy
+f = Fml.Final (Var.mk "f")
 
-fml3 = Fml.Imply vx vy
+fml1 = Fml.And (Fml.And (Fml.Or (Fml.And (Fml.And a vz) vx) vy) b) (Fml.And c d)
 
-fml4 = Fml.Equiv vx vy
+fml2 = Fml.And a (Fml.And b (Fml.And c d))
 
-fml5 = Fml.XOr vx vy
-
-fml6 = Fml.XNOr vx vy
-
-fml7 = Fml.Not (Fml.And vx vz)
-
-fml8 = Fml.NAnd a b
-
-fml9 = Fml.NAnd (Fml.NAnd a b) c
-
-fml10 = Fml.NAnd (Fml.And a b) c
-
-fml11 = Fml.And (Fml.And (Fml.Or (Fml.And (Fml.And a vz) vx) vy) b) (Fml.And c d)
-
-fml12 = Fml.And a (Fml.And b (Fml.And c d))
-
-fml13 = Fml.And (Fml.And (Fml.Or a b) (Fml.Or (Fml.Not b) c)) (Fml.Or (Fml.Or a b) (Fml.Not c))
+fml3 = Fml.And (Fml.And (Fml.Or a b) (Fml.Or (Fml.Not b) c)) (Fml.Or (Fml.Or a b) (Fml.Not c))
