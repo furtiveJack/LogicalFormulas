@@ -85,23 +85,30 @@ depth (Equiv p q) = 1 + max (depth p) (depth q)
 depth (Not p) = 1 + depth p
 depth (Final v) = 0
 
--- THERE ARE PROBLEMS BRO
 -- |’toNNF’ @f@ converts the formula @f@ to NNF.
 toNNF :: Fml a -> Fml a
-toNNF (Final a) = Final a
-toNNF (Not (Not a)) = toNNF a
+toNNF (Final p) = Final p
+toNNF (Not (Final p)) = (Not (Final p))
+toNNF (Not (Not p)) = p
+
 toNNF (And p q) = And (toNNF p) (toNNF q)
+toNNF (NAnd p q) = toNNF (Or (Not p) (Not q))
 toNNF (Not (And p q)) = toNNF (NAnd p q)
-toNNF (NAnd p q) = toNNF (Or (Not (toNNF p)) (Not (toNNF q)))
+
 toNNF (Or p q) = Or (toNNF p) (toNNF q)
+toNNF (NOr p q) = toNNF (And (Not p) (Not q))
 toNNF (Not (Or p q)) = toNNF (NOr p q)
-toNNF (NOr p q) = And (Not (toNNF p)) (Not (toNNF q))
-toNNF (XOr p q) = And (Or (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
+
+toNNF (XOr p q) = toNNF (And (Or p q) (NAnd p q))
+toNNF (XNOr p q) = toNNF (Not (XOr p q))
 toNNF (Not (XOr p q)) = toNNF (XNOr p q)
-toNNF (XNOr p q) = Or (And (toNNF p) (toNNF q)) (And (Not (toNNF p)) (Not (toNNF q)))
-toNNF (Imply p q) = Or (toNNF q) (Not (toNNF p))
-toNNF (Equiv p q) = And (toNNF (Imply (toNNF p) (toNNF q))) (toNNF (Imply (toNNF q) (toNNF p)))
+
+toNNF (Imply p q) = toNNF (Or (Not p) q)
+toNNF (Equiv p q) = toNNF (Or (And p q) (And (Not p) (Not q)))
+
 toNNF (Not p) = Not (toNNF p)
+
+
 
 -- |’toCNF’ @f@ converts the formula @f@ to CNF.
 toCNF :: Fml a -> Fml a
@@ -111,7 +118,7 @@ toCNF = toCNF' . toNNF
     toCNF' (Final a) = Final a
     toCNF' (And p q) = And (toCNF' p) (toCNF' q)
     toCNF' (Or p q) = (toCNF' p) `distribution` (toCNF' q)
-    toCNF' (Not p) = Not p
+    toCNF' (Not p) = Not (toCNF' p)
 
     distribution :: Fml a -> Fml a -> Fml a
     distribution (And p q) r = And (p `distribution` r) (q `distribution` r)

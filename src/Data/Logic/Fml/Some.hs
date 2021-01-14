@@ -12,7 +12,8 @@ module Data.Logic.Fml.Some (
   atMostOneFml,
   atMostTwoFml,
   exactlyOneFml,
-  exactlyTwoFml
+  exactlyTwoFml,
+  fml1
 ) where
 
 import qualified Data.Logic.Fml as Fml
@@ -53,3 +54,5 @@ atMostTwoFml = Fml.Or (Fml.And (Fml.Not v1) (Fml.Not v2))
 exactlyOneFml = Fml.And atLeastOneFml atMostOneFml
 
 exactlyTwoFml = Fml.And atLeastTwoFml atMostTwoFml
+
+fml1 = Fml.Equiv (Fml.And v1 v2) (Fml.Or v2 (Fml.Not v3))

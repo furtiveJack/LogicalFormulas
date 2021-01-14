@@ -55,3 +55,22 @@ main = hspec $ do
 
     it "should be equals to exactlyOneFml" $ do
       (fmap Fml.prettyFormat $ Combinator.exactlyOne [Var.mk i | i <- [1..4]]) == (fmap Fml.prettyFormat $ (Just (Some.exactlyOneFml)))
+
+  describe "Data.Logic.Fml unit tests" $ do
+    it "should return True" $ do
+      (Fml.isNNF $ Fml.toNNF Some.fml1) == True
+
+    it "should return True" $ do
+      (Fml.isCNF $ Fml.toCNF Some.fml1) == True
+
+    it "should return True" $ do
+      (Fml.isDNF $ Fml.toDNF Some.fml1) == True
+
+    it "should return True" $ do
+      (Fml.isCCNF $ Fml.toCCNF Some.fml1) == True
+
+    it "should return True" $ do
+      (Fml.isUniversalNOr $ Fml.toUniversalNOr Some.fml1) == True
+
+    it "should return True" $ do
+      (Fml.isUniversalNAnd $ Fml.toUniversalNAnd Some.fml1) == True
